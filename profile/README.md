@@ -21,7 +21,7 @@ The documentation is available at https://kyverno.io which also contains a user-
 
 ### Community
 
-We thrive on the community and would love you to participate with us. Please join us in the #kyverno channel on the [Kubernetes workspace](kubernetes.slack.com) or the [CNCF workspace](cloud-native.slack.com).
+We thrive on the community and would love you to participate with us. Please join us in the #kyverno channel on the [Kubernetes workspace](https://kubernetes.slack.com) or the [CNCF workspace](https://cloud-native.slack.com).
 
 <!--
 
