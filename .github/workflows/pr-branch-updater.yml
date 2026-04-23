@@ -1,0 +1,72 @@
+# Reusable workflow — update PR branches that are behind their base branch.
+#
+# Usage (from a consumer repo):
+#
+#   jobs:
+#     update:
+#       uses: kyverno/.github/.github/workflows/pr-branch-updater.yml@main
+#       secrets:
+#         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#
+# Inputs:
+#   base_branch — only update PRs targeting this branch.
+#                 Defaults to the repository's default branch.
+#
+# The workflow iterates every non-draft open PR, fetches its full record to get
+# a reliable mergeable_state (the bulk list endpoint returns "unknown"), and
+# calls the update-branch API for each PR whose state is "behind".
+# Per-PR failures are non-fatal: the job logs them and continues.
+# The job exits non-zero only if every attempted update encountered an
+# unexpected error (i.e. the total unexpected-failure count is > 0).
+
+name: PR Branch Auto-Updater
+
+on:
+  workflow_call:
+    inputs:
+      base_branch:
+        description: >-
+          Only update PRs targeting this branch.
+          Leave empty to use the repository default branch.
+        required: false
+        type: string
+        default: ""
+    secrets:
+      GH_TOKEN:
+        description: >-
+          GitHub token with contents:write and pull-requests:write permissions.
+          Falls back to the built-in github.token when not supplied.
+        required: false
+
+permissions: {}
+
+jobs:
+  update-pr-branches:
+    name: Update out-of-date PR branches
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out shared scripts
+        # Sparse-checkout only the scripts/ directory from kyverno/.github so
+        # the workspace stays clean. Pin to a tag/SHA for production stability.
+        uses: actions/checkout@v4
+        with:
+          repository: kyverno/.github
+          ref: main
+          path: .kyverno-github
+          sparse-checkout: scripts
+          sparse-checkout-cone-mode: true
+          persist-credentials: false
+
+      - name: Find and update behind PRs
+        env:
+          # Prefer the caller-supplied token; fall back to the built-in one.
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+          REPO: ${{ github.repository }}
+          # Use the caller's explicit base branch or the repo default branch.
+          # github.event.repository.default_branch is available on workflow_call.
+          TARGET_BASE: ${{ inputs.base_branch || github.event.repository.default_branch }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+        run: bash .kyverno-github/scripts/update-pr-branches.sh

@@ -1,0 +1,37 @@
+name: Test Scripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/**
+      - tests/**
+  pull_request:
+    paths:
+      - scripts/**
+      - tests/**
+
+permissions:
+  contents: read
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        run: shellcheck scripts/*.sh
+
+  bats:
+    name: Unit tests (bats)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bats
+        run: |
+          git clone --depth 1 --branch v1.11.0 \
+            https://github.com/bats-core/bats-core.git /tmp/bats-core
+          sudo /tmp/bats-core/install.sh /usr/local
+      - name: Run tests
+        run: bats tests/update-pr-branches.bats
