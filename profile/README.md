@@ -3,7 +3,7 @@
 
 ![kyverno](/kyverno-horizontal-color-small.png)
 
-Kyverno (κυβερνώ, Greek for "govern") is a policy management solution for Kubernetes and other cloud native environments. Kyverno policies can validate, mutate, generate, and clean-up resources. Kyverno can also verify OCI container images for software supply chain security. Kyverno policies are delarative and do not require learning a new programming language.
+Kyverno (κυβερνώ, Greek for "govern") is a policy management solution for Kubernetes and other cloud native environments. Kyverno policies can validate, mutate, generate, and clean-up resources. Kyverno can also verify OCI container images for software supply chain security. Kyverno policies are declarative and do not require learning a new programming language.
 
 GitHub is Kyverno's home and here you can find all the interesting things the Kyverno community are working on.
 
