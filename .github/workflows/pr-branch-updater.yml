@@ -51,7 +51,7 @@ jobs:
       - name: Check out shared scripts
         # Sparse-checkout only the scripts/ directory from kyverno/.github so
         # the workspace stays clean. Pin to a tag/SHA for production stability.
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: kyverno/.github
           ref: main
