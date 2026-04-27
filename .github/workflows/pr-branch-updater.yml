@@ -5,19 +5,17 @@
 #   jobs:
 #     update:
 #       uses: kyverno/.github/.github/workflows/pr-branch-updater.yml@main
-#       with:
-#         app_client_id: ${{ secrets.PR_UPDATER_APP_CLIENT_ID }}
 #       secrets:
+#         APP_CLIENT_ID: ${{ secrets.PR_UPDATER_APP_CLIENT_ID }}
 #         APP_PRIVATE_KEY: ${{ secrets.PR_UPDATER_APP_PRIVATE_KEY }}
 #
 # Inputs:
 #   base_branch — only update PRs targeting this branch.
 #                 Defaults to the repository's default branch.
-#   app_client_id — GitHub App client ID used to mint an
-#                   installation token for this workflow.
 #
 # Required secrets:
-#   APP_PRIVATE_KEY — GitHub App private key paired with app_client_id.
+#   APP_CLIENT_ID — GitHub App client ID used to mint an installation token.
+#   APP_PRIVATE_KEY — GitHub App private key paired with APP_CLIENT_ID.
 #
 # The workflow iterates every non-draft open PR, fetches its full record to get
 # a reliable mergeable_state (the bulk list endpoint returns "unknown"), and
@@ -38,15 +36,14 @@ on:
         required: false
         type: string
         default: ""
-      app_client_id:
+    secrets:
+      APP_CLIENT_ID:
         description: >-
           GitHub App client ID used to mint a short-lived installation token.
         required: true
-        type: string
-    secrets:
       APP_PRIVATE_KEY:
         description: >-
-          GitHub App private key paired with app_client_id.
+          GitHub App private key paired with APP_CLIENT_ID.
         required: true
 
 permissions: {}
@@ -75,7 +72,7 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          client-id: ${{ inputs.app_client_id }}
+          client-id: ${{ secrets.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           permission-contents: write

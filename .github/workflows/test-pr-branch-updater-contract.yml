@@ -16,7 +16,7 @@ jobs:
     name: Call reusable workflow (safe mode)
     uses: ./.github/workflows/pr-branch-updater.yml
     with:
-      app_client_id: ${{ secrets.PR_UPDATER_APP_CLIENT_ID }}
       base_branch: ${{ inputs.base_branch }}
     secrets:
+      APP_CLIENT_ID: ${{ secrets.PR_UPDATER_APP_CLIENT_ID }}
       APP_PRIVATE_KEY: ${{ secrets.PR_UPDATER_APP_PRIVATE_KEY }}
