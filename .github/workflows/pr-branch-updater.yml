@@ -68,13 +68,49 @@ jobs:
           sparse-checkout-cone-mode: true
           persist-credentials: false
 
+      - name: Normalize GitHub App private key
+        id: normalize-key
+        shell: bash
+        env:
+          RAW_APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+
+          key="$RAW_APP_PRIVATE_KEY"
+          # Support secrets saved with escaped newlines.
+          key="${key//\\n/$'\n'}"
+
+          if ! printf '%s' "$key" | grep -Eq 'BEGIN (RSA |EC |)PRIVATE KEY'; then
+            # Support secrets saved as base64-encoded PEM.
+            decoded="$(printf '%s' "$RAW_APP_PRIVATE_KEY" | tr -d '[:space:]' | base64 --decode 2>/dev/null || true)"
+            decoded="${decoded//\\n/$'\n'}"
+            if printf '%s' "$decoded" | grep -Eq 'BEGIN (RSA |EC |)PRIVATE KEY'; then
+              key="$decoded"
+            fi
+          fi
+
+          if ! printf '%s' "$key" | grep -Eq 'BEGIN (RSA |EC |)PRIVATE KEY'; then
+            echo "APP_PRIVATE_KEY does not look like a valid PEM private key." >&2
+            echo "Store the key exactly as downloaded from the GitHub App settings," >&2
+            echo "or as base64-encoded PEM content." >&2
+            exit 1
+          fi
+
+          echo "::add-mask::$key"
+          {
+            echo "private_key<<EOF"
+            printf '%s\n' "$key"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub App token
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
           client-id: ${{ secrets.APP_CLIENT_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          private-key: ${{ steps.normalize-key.outputs.private_key }}
           owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
           permission-contents: write
           permission-pull-requests: write
           permission-workflows: write
