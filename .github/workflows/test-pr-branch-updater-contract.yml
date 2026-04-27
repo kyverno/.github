@@ -9,7 +9,9 @@ on:
         default: does-not-exist
         type: string
 
-permissions: {}
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   contract-test:
