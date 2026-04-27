@@ -5,12 +5,19 @@
 #   jobs:
 #     update:
 #       uses: kyverno/.github/.github/workflows/pr-branch-updater.yml@main
+#       with:
+#         app_client_id: ${{ secrets.PR_UPDATER_APP_CLIENT_ID }}
 #       secrets:
-#         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         APP_PRIVATE_KEY: ${{ secrets.PR_UPDATER_APP_PRIVATE_KEY }}
 #
 # Inputs:
 #   base_branch — only update PRs targeting this branch.
 #                 Defaults to the repository's default branch.
+#   app_client_id — GitHub App client ID used to mint an
+#                   installation token for this workflow.
+#
+# Required secrets:
+#   APP_PRIVATE_KEY — GitHub App private key paired with app_client_id.
 #
 # The workflow iterates every non-draft open PR, fetches its full record to get
 # a reliable mergeable_state (the bulk list endpoint returns "unknown"), and
@@ -31,12 +38,16 @@ on:
         required: false
         type: string
         default: ""
-    secrets:
-      GH_TOKEN:
+      app_client_id:
         description: >-
-          GitHub token with contents:write and pull-requests:write permissions.
-          Falls back to the built-in github.token when not supplied.
-        required: false
+          GitHub App client ID used to mint a short-lived installation token.
+        required: true
+        type: string
+    secrets:
+      APP_PRIVATE_KEY:
+        description: >-
+          GitHub App private key paired with app_client_id.
+        required: true
 
 permissions: {}
 
@@ -60,10 +71,20 @@ jobs:
           sparse-checkout-cone-mode: true
           persist-credentials: false
 
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ inputs.app_client_id }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-workflows: write
+
       - name: Find and update behind PRs
         env:
-          # Prefer the caller-supplied token; fall back to the built-in one.
-          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           REPO: ${{ github.repository }}
           # Use the caller's explicit base branch or the repo default branch.
           # github.event.repository.default_branch is available on workflow_call.

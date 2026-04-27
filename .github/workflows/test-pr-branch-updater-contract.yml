@@ -1,0 +1,22 @@
+name: Test PR Branch Updater Contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_branch:
+        description: Base branch filter to use for contract test
+        required: false
+        default: does-not-exist
+        type: string
+
+permissions: {}
+
+jobs:
+  contract-test:
+    name: Call reusable workflow (safe mode)
+    uses: ./.github/workflows/pr-branch-updater.yml
+    with:
+      app_client_id: ${{ secrets.PR_UPDATER_APP_CLIENT_ID }}
+      base_branch: ${{ inputs.base_branch }}
+    secrets:
+      APP_PRIVATE_KEY: ${{ secrets.PR_UPDATER_APP_PRIVATE_KEY }}
