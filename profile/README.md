@@ -13,8 +13,6 @@ GitHub is Kyverno's home and here you can find all the interesting things the Ky
 
 * **Policy Reporter** ([web](https://kyverno.github.io/policy-reporter/), [repo](https://github.com/kyverno/policy-reporter)): in-cluster management of policy violations and reports with a graphical web-based front end.
 
-* **Kyverno JSON** ([web](https://kyverno.github.io/kyverno-json/latest/), [repo](https://github.com/kyverno/kyverno-json)): Kyverno policies for non-Kubernetes workloads and any JSON payload.
-
 * **Chainsaw** ([web](https://kyverno.github.io/chainsaw/latest/), [repo](https://github.com/kyverno/chainsaw)): A declarative end-to-end testing tool for Kubernetes operators.
 
 * **Kyverno Envoy Plugin** ([web](https://kyverno.github.io/kyverno-envoy-plugin/latest/), [repo](https://github.com/kyverno/kyverno-envoy-plugin)): Authorization policies for Envoy based service meshes.
