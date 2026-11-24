@@ -16,6 +16,7 @@
 #       uses: kyverno/.github/.github/workflows/pr-branch-updater.yml@main
 #       with:
 #         environment: pr-updater-app
+#       secrets: inherit
 #
 # Inputs:
 #   base_branch — only update PRs targeting this branch.
@@ -25,6 +26,9 @@
 #                 environment secrets can't be passed with `secrets:`, so the
 #                 job reads PR_UPDATER_APP_CLIENT_ID and
 #                 PR_UPDATER_APP_PRIVATE_KEY from the environment directly.
+#                 The caller must also set `secrets: inherit`: a reusable
+#                 workflow sees only the secrets its caller passes, even when
+#                 its job runs in an environment.
 #
 # Secrets (required unless environment is set):
 #   APP_CLIENT_ID — GitHub App client ID used to mint an installation token.

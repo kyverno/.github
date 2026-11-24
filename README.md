@@ -22,7 +22,7 @@ Finds open, non-draft pull requests whose branches have fallen behind their base
 | Input | Required | Default | Description |
 |---|---|---|---|
 | `base_branch` | No | repo default branch | Only update PRs targeting this branch. |
-| `environment` | No | none | Deployment environment of the caller repository to run the job in. The job then reads `PR_UPDATER_APP_CLIENT_ID` and `PR_UPDATER_APP_PRIVATE_KEY` from that environment. Use an environment with deployment branch rules to keep the app key away from runs on other branches. |
+| `environment` | No | none | Deployment environment of the caller repository to run the job in. The job then reads `PR_UPDATER_APP_CLIENT_ID` and `PR_UPDATER_APP_PRIVATE_KEY` from that environment. Use an environment with deployment branch rules to keep the app key away from runs on other branches. The caller must also set `secrets: inherit`, because a reusable workflow sees only the secrets its caller passes. |
 
 **Secrets**
 
